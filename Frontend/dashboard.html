@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="dashboard2.css">
+</head>
+<body>
+  <h1>Admin Dashboard</h1>
+
+  <section>
+    <h2>Issued Books</h2>
+    <table id="issuedBooks"></table>
+  </section>
+
+  <section>
+    <h2>Available Books</h2>
+    <table id="availableBooks"></table>
+  </section>
+
+  <section>
+    <h2>New Book Issue</h2>
+    <form id="issueForm">
+      <input type="text" placeholder="Book ID" name="bookId" required>
+      <input type="text" placeholder="User ID" name="userId" required>
+      <input type="date" name="issueDate" required>
+      <input type="date" name="dueDate" required>
+      <button type="submit">Issue Book</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Return Book</h2>
+    <form id="returnForm">
+      <input type="text" placeholder="Book ID" name="bookId" required>
+      <input type="text" placeholder="User ID" name="userId" required>
+      <button type="submit">Return Book</button>
+    </form>
+  </section>
+
+  <div id="status">Checking connection...</div>
+
+  <script>
+    // Helper: format date YYYY-MM-DD
+    function formatDate(dateString) {
+      return new Date(dateString).toISOString().split('T')[0];
+    }
+
+    // Check backend connection
+    window.addEventListener("DOMContentLoaded", () => {
+      fetch("http://localhost:5000/api/ping")
+        .then(response => response.json())
+        .then(data => {
+          console.log("Connected to backend:", data.message);
+          document.getElementById("status").textContent = "✅ Backend connected";
+          loadTables();
+        })
+        .catch(error => {
+          console.error("Error connecting to backend:", error);
+          document.getElementById("status").textContent = "❌ Backend NOT connected";
+        });
+    });
+
+    // Load tables
+    async function loadTables() {
+      try {
+        const issued = await fetch('http://localhost:5000/api/books/issued').then(res => res.json());
+        const available = await fetch('http://localhost:5000/api/books/available').then(res => res.json());
+
+        const issuedTable = document.getElementById('issuedBooks');
+        issuedTable.innerHTML = '<tr><th>Title</th><th>User ID</th><th>Issue Date</th><th>Due Date</th></tr>' +
+          issued.map(row => `
+            <tr>
+              <td>${row.title}</td>
+              <td>${row.userId}</td>
+              <td>${formatDate(row.issueDate)}</td>
+              <td>${formatDate(row.dueDate)}</td>
+            </tr>
+          `).join('');
+
+        const availableTable = document.getElementById('availableBooks');
+        availableTable.innerHTML = '<tr><th>ID</th><th>Title</th><th>Author</th><th>Quantity</th></tr>' +
+          available.map(row => `
+            <tr>
+              <td>${row._id}</td>
+              <td>${row.title}</td>
+              <td>${row.author}</td>
+              <td>${row.quantity}</td>
+            </tr>
+          `).join('');
+      } catch (error) {
+        console.error('Error loading tables:', error);
+      }
+    }
+
+    // Handle issue book
+    document.getElementById('issueForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch('http://localhost:5000/api/books/issue', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        alert(result.message || "Book issued!");
+        loadTables(); // Refresh tables
+        e.target.reset();
+      } catch (error) {
+        console.error('Issue book error:', error);
+        alert("Error issuing book!");
+      }
+    });
+
+    // Handle return book
+    document.getElementById('returnForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch('http://localhost:5000/api/books/return', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        alert(result.message || "Book returned!");
+        loadTables(); // Refresh tables
+        e.target.reset();
+      } catch (error) {
+        console.error('Return book error:', error);
+        alert("Error returning book!");
+      }
+    });
+
+  </script>
+</body>
+</html>

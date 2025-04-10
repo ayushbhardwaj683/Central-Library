@@ -1,0 +1,71 @@
+/* Reset some default margins */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #121212; /* Dark background */
+    color: #ffffff; /* Light text */
+  }
+  
+  .login-box {
+    background: #1f1f1f;
+    padding: 40px 30px;
+    width: 320px;
+    border-radius: 12px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    text-align: center;
+  }
+  
+  .login-box h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #e0e0e0;
+  }
+  
+  .login-box input {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 12px 0;
+    background: #2c2c2c;
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 16px;
+    outline: none;
+  }
+  
+  .login-box input::placeholder {
+    color: #aaa;
+  }
+  
+  button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 12px;
+    background-color: #4CAF50; /* Soothing green */
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  
+  /* Optional: Smooth focus effect */
+  input:focus, button:focus {
+    outline: 2px solid #4CAF50;
+    outline-offset: 2px;
+  }
+  
